@@ -1,13 +1,22 @@
 <template>
-  <div>    
-    <canvas tabindex="0" 
-      id="sim-canvas"
-      v-on:keydown.a="keyADown"
-      v-on:keyup.a="keyAUp"
-      v-on:keydown.b="keyBDown"
-      v-on:keyup.b="keyBUp"
-      width="256" 
-      height="128"></canvas>
+  <div 
+    tabindex="0"
+    v-on:keydown.a="keyADown"
+    v-on:keyup.a="keyAUp"
+    v-on:keydown.b="keyBDown"
+    v-on:keyup.b="keyBUp">
+    <center>
+      <img src="../assets/dodo_large.png" width=764 usemap="#game_pad">
+      <map name="game_pad">
+        <area shape="rect" coords="509,374,574,439" href="#" @mousedown="keyADown" @mouseup="keyAUp" />
+      </map>
+      <canvas
+        id="sim-canvas"
+        style="position:absolute; top:104px; left:271px; z-index:1"
+        width="256" 
+        height="128"></canvas>
+    </center>
+    <p>Frames Per Cycle: {{ cycles }}</p>
   </div>
 </template>
 
@@ -16,9 +25,10 @@ import dodo from './wasm/index.js'
 
 export default {
   name: 'Simulator',
-  props: ['firmware', 'binary'],
+  props: ['firmware', 'binary', 'stopped'],
   data() {
     return {
+      cycles: 0,
       A: false,
       B: false
     }
@@ -38,6 +48,12 @@ export default {
   watch: {
     keyState: async function(val) {
       await dodo.updateKeys(val)
+    },
+    stopped: async function(val) {
+      if (val) {
+        console.log('Stopping')
+        await dodo.stop()
+      }
     }
   },
   async mounted() {
@@ -57,10 +73,12 @@ export default {
     var firmwareBytes = new Uint8Array(buffer.default)
 
     await dodo.init()
-    await dodo.run(ctx, firmwareBytes, this.binary)
+    await dodo.run(ctx, firmwareBytes, this.binary, (cycles) => {
+      this.cycles = cycles
+    })
   },
   async unmounted() {
-      console.log("Unmounting")
+      console.log('Unmounting')
       await dodo.stop()
   },
   methods: {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"syscall/js"
 )
 
@@ -22,6 +23,8 @@ func (s *WebSpeaker) New() {
 	s.Gain = s.Context.Call("createGain")
 	s.Mute = false
 	s.Enabled = false
+
+	fmt.Println(s.Context)
 }
 
 func (s *WebSpeaker) SetFrequency(freq int) {
@@ -34,7 +37,7 @@ func (s *WebSpeaker) SetFrequency(freq int) {
 		return
 	}
 
-	if !s.Oscillator.IsNull() {
+	if !s.Oscillator.IsUndefined() {
 		s.Oscillator.Call("stop")
 	}
 
@@ -50,10 +53,12 @@ func (s *WebSpeaker) SetFrequency(freq int) {
 }
 
 func (s *WebSpeaker) Enable() {
+	fmt.Println("Enabling Speaker")
 	s.Enabled = true
 }
 
 func (s *WebSpeaker) Disable() {
+	fmt.Println("Disabling Speaker")
 	s.Gain.Get("gain").Set("value", 0)
 	s.Enabled = false
 }

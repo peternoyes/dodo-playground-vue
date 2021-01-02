@@ -45,11 +45,13 @@
         </b-col>
       </b-row>
     </b-container>
-    <b-modal id="bv-modal-simulator" 
+    <b-modal id="bv-modal-simulator"
+      size="lg"
+      @hide="stop"
       header-bg-variant="dark"
       header-text-variant="light"
       centered hide-footer title="Simulator">
-      <Simulator v-bind:firmware="firmware" v-bind:binary="binary" />
+      <Simulator v-bind:firmware="firmware" v-bind:binary="binary" v-bind:stopped="stopped" />
     </b-modal>
   </div>
 </template>
@@ -76,6 +78,7 @@ export default {
       },      
       content: '',
       binary: null,
+      stopped: false,
       language: 'c',
       languageOptions: [
         { value: 'c', text: 'C'},
@@ -142,12 +145,23 @@ export default {
       try {
         let response = await this.compileCode()
         this.binary = helpers.b64toUint8Array(response.data.binary)
+
+        this.setStatus('Loading Simulator...', 'bg-success')
+
+        // TODO: load from local storage for Fram
         
         // Start Simulator
+        this.stopped = false
         this.$bvModal.show('bv-modal-simulator')
+
+
       } catch (error) {
         this.setStatus(error.response.data, 'bg-danger')
       }
+    },
+    stop: async function() {
+      this.stopped = true
+      this.setStatus('Simulator Stopped.', 'bg-success')
     },
     download: async function() {
       this.setStatus('Compiling...', 'bg-info')

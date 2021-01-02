@@ -11,6 +11,7 @@ import (
 var simulator *dodosim.SimulatorSync
 var didStop bool
 var keys string = ""
+var c chan bool
 
 func main() {
 	fmt.Println("WASM: .main()")
@@ -21,7 +22,9 @@ func main() {
 	js.Global().Set("_dodo_simulator_stop", stop())
 	js.Global().Set("_dodo_simulator_update_keys", updateKeys())
 
-	<-make(chan bool)
+	c = make(chan bool)
+	<-c
+	fmt.Println("WASM: closing down")
 }
 
 func run() js.Func {
@@ -43,9 +46,12 @@ func run() js.Func {
 
 		firmware := jsToByteArray(args[1])
 		fram := jsToByteArray(args[2])
+		callback := args[3]
 
 		simulator.CyclesPerFrame = func(cycles uint64) {
-
+			if !didStop {
+				callback.Invoke(uint32(cycles))
+			}
 		}
 
 		simulator.SimulateSyncInit(firmware, fram, framFlusher)
@@ -72,10 +78,13 @@ func run() js.Func {
 		every(time.Millisecond*time.Duration(delay), func() bool {
 			simulator.PumpClock(keys)
 
+			if didStop {
+				speaker.Disable()
+				c <- true
+			}
+
 			return !didStop
 		})
-
-		speaker.Disable()
 
 		return 0
 	})
