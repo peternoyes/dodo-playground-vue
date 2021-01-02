@@ -21,7 +21,7 @@ module.exports = {
                     use: "raw-loader"   
                 },
                 {
-                    test: /\.wasm$/,
+                    test: /\.wasm|bin$/,
                     type: 'javascript/auto',
                     loaders: ['arraybuffer-loader'],
                 }                        

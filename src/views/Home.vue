@@ -49,7 +49,7 @@
       header-bg-variant="dark"
       header-text-variant="light"
       centered hide-footer title="Simulator">
-      <Simulator />
+      <Simulator v-bind:firmware="firmware" v-bind:binary="binary" />
     </b-modal>
   </div>
 </template>
@@ -75,6 +75,7 @@ export default {
         background: 'bg-success'
       },      
       content: '',
+      binary: null,
       language: 'c',
       languageOptions: [
         { value: 'c', text: 'C'},
@@ -139,12 +140,11 @@ export default {
       this.setStatus('Compiling...', 'bg-info')
      
       try {
-      let response = await this.compileCode()
-      
-      // Start Simulator
-      this.$bvModal.show('bv-modal-simulator')
-
-        console.log(response.data.binary)
+        let response = await this.compileCode()
+        this.binary = helpers.b64toUint8Array(response.data.binary)
+        
+        // Start Simulator
+        this.$bvModal.show('bv-modal-simulator')
       } catch (error) {
         this.setStatus(error.response.data, 'bg-danger')
       }

@@ -16,6 +16,15 @@ module.exports = {
     }
 
     const blob = new Blob(byteArrays, {type: contentType});
-    return blob;
+    return blob;    
+  },
+  b64toUint8Array: (b64Data) => {
+    const byteCharacters = atob(b64Data)
+    const len = byteCharacters.length
+    const bytes = new Uint8Array(len)
+    for (let i = 0; i < len; i++) {
+      bytes[i] = byteCharacters.charCodeAt(i)    
+    }
+    return bytes
   }
 }

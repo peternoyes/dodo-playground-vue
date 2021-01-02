@@ -8,8 +8,14 @@ const funcs = {
       go.run(result.instance)      
     })
   },
-  async run() {
-    return global._dodo_simulator_run()
+  async run(ctx, firmware, binary) {
+    return global._dodo_simulator_run(ctx, firmware, binary)
+  },
+  async stop() {
+    return global._dodo_simulator_stop()
+  },
+  async updateKeys(keys) {
+    return global._dodo_simulator_update_keys(keys)
   }
 }
 
