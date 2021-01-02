@@ -16,7 +16,16 @@ module.exports = {
                     }
                 ]
                 },
+                {
+                    test: /\.c$/,
+                    use: "raw-loader"   
+                },
+                {
+                    test: /\.wasm$/,
+                    type: 'javascript/auto',
+                    loaders: ['arraybuffer-loader'],
+                }                        
             ],
-        },
+        }
     }
   };
