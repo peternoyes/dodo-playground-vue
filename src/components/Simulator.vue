@@ -9,6 +9,7 @@
       <img src="../assets/dodo_large.png" width=764 usemap="#game_pad">
       <map name="game_pad">
         <area shape="rect" coords="509,374,574,439" href="#" @mousedown="keyADown" @mouseup="keyAUp" />
+        <area shape="rect" coords="602,374,668,439" href="#" @mousedown="keyBDown" @mouseup="keyBUp" />
       </map>
       <canvas
         id="sim-canvas"
