@@ -20,7 +20,7 @@
             </b-nav-item-dropdown>
             <b-nav-form>            
               <b-button pill variant="info" class="ml-2" :disabled="!showEditor" @click="run"><span><b-icon icon="play" /> Run</span></b-button>
-              <b-button pill v-if="hasToken" variant="info" class="ml-2" :disabled="!showEditor" ><span><b-icon icon="cloud-check" /> Save</span></b-button>
+              <b-button pill v-if="hasToken" variant="info" class="ml-2" :disabled="!showEditor" @click="saveProject"><span><b-icon icon="cloud-check" /> Save</span></b-button>
               <b-button pill variant="success" class="ml-2" :disabled="!showEditor"  @click="download"><span><b-icon icon="download" /> fram.bin</span></b-button>
               <b-button pill v-if="canFlash" variant="warning" class="ml-2" :disabled="!showEditor" @click="flash" ><span><b-icon icon="lightning" /> Flash</span></b-button>
             </b-nav-form>          
@@ -69,10 +69,7 @@
       header-bg-variant="dark"
       header-text-variant="light"
       centered hide-footer title="Flash">
-        <p>
-          After choosing the appropriate COM port, ensure that Dodo is on the home screen before selecting 'Start' which will immediately flash Dodo. After successfully flashing Dodo, it will take a few additional seconds to load the game.
-        </p>
-        <b-button @click="openPort">Open Port</b-button>
+      <Flash v-bind:binary="binary" />
     </b-modal>
   </div>
 </template>
@@ -82,6 +79,7 @@
 import Documentation from '../components/Documentation.vue'
 import Projects from '../components/Projects.vue'
 import Simulator from '../components/Simulator.vue'
+import Flash from '../components/Flash.vue'
 import DefaultCode from '../assets/default.c'
 import helpers from '../helpers.js'
 
@@ -91,6 +89,7 @@ export default {
     Documentation,
     Projects,
     Simulator,
+    Flash,
     editor: require('vue2-ace-editor')    
   },
   data() {
@@ -194,7 +193,10 @@ export default {
       this.status.background = background
     },
     run: async function() {
-      // TODO Save      
+      if (this.hasProject) {
+        this.saveProject()        
+      }
+
       this.setStatus('Compiling...', 'bg-info')
      
       try {
@@ -241,13 +243,7 @@ export default {
       this.setStatus('Flashing...', 'bg-success')
 
       this.$bvModal.show('bv-modal-flash')
-    },
-    openPort: async function() {
-      let port = await navigator.serial.requestPort();
-
-      await port.open({ baudrate: 9600 })
-
-    },
+    },    
     login: function() {
       console.log('Login...')
       window.location.href = `${process.env.VUE_APP_API_URL}/login`
@@ -261,6 +257,27 @@ export default {
       this.content = project.source
       this.language = project.language
       this.firmware = project.version            
+    },
+    saveProject: async function() {
+      let title = this.title
+      let source = this.content      
+      let config = {        
+        headers: {
+          'Content-Type': 'application/text',
+          'X-Language': this.language,
+          'X-Version': this.firmware
+        }
+      }
+
+      return await this.axios.put(`${process.env.VUE_APP_API_URL}/projects/${title}`, source, config)
+        .then(() => {
+          console.log('saved')
+          this.setStatus(`Successfully saved ${title}`, 'bg-success')
+        })
+        .catch((reason) => {
+          console.log(reason)
+          this.setStatus(`Failed to save ${title}`, 'bg-danger')
+        })
     }
   },
 }
