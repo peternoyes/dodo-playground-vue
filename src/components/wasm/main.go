@@ -12,6 +12,7 @@ var simulator *dodosim.SimulatorSync
 var didStop bool
 var keys string = ""
 var c chan bool
+var framCallback js.Value
 
 func main() {
 	fmt.Println("WASM: .main()")
@@ -21,6 +22,7 @@ func main() {
 	js.Global().Set("_dodo_simulator_run", run())
 	js.Global().Set("_dodo_simulator_stop", stop())
 	js.Global().Set("_dodo_simulator_update_keys", updateKeys())
+	js.Global().Set("_dodo_simulator_set_fram_flusher", setFramFlusher())
 
 	c = make(chan bool)
 	<-c
@@ -107,6 +109,15 @@ func updateKeys() js.Func {
 	return jsonFunc
 }
 
+func setFramFlusher() js.Func {
+	jsonFunc := js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+		fmt.Println("WASM: .setFramFlusher()")
+		framCallback = args[0]
+		return 0
+	})
+	return jsonFunc
+}
+
 func jsToByteArray(arr js.Value) []byte {
 	len := arr.Get("length").Int()
 	buf := make([]byte, len)
@@ -124,11 +135,8 @@ func every(duration time.Duration, fn func() bool) {
 }
 
 func framFlusher(f *dodosim.Fram) {
-	/*
-		if activeProject != "" {
-			// Save to persistant storage or cookie
-			data := f.Data[4:68]
-			log.Printf("Flushing: ", data)
-			localStorage.Call("setItem", activeProject, data)
-		}*/
+	buf := f.Data[4:68]
+	dst := js.Global().Get("Uint8Array").New(len(buf))
+	js.CopyBytesToJS(dst, buf)
+	framCallback.Invoke(dst)
 }

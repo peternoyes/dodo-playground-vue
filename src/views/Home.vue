@@ -62,7 +62,7 @@
       header-bg-variant="dark"
       header-text-variant="light"
       centered hide-footer title="Simulator">
-      <Simulator v-bind:firmware="firmware" v-bind:binary="binary" v-bind:stopped="stopped" />
+      <Simulator v-bind:firmware="firmware" v-bind:binary="binary" v-bind:id="id" v-bind:stopped="stopped" />
     </b-modal>
     <b-modal id="bv-modal-flash"
       size="lg"
@@ -102,6 +102,7 @@ export default {
       title: '',
       content: '',
       binary: null,
+      id: '',
       stopped: false,
       language: 'c',
       token: '',
@@ -202,10 +203,9 @@ export default {
       try {
         let response = await this.compileCode()
         this.binary = helpers.b64toUint8Array(response.data.binary)
+        this.id = response.data.id
 
-        this.setStatus('Loading Simulator...', 'bg-success')
-
-        // TODO: load from local storage for Fram (What does this mean??)
+        this.setStatus('Loading Simulator...', 'bg-success')  
         
         // Start Simulator
         this.stopped = false

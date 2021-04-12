@@ -16,6 +16,9 @@ const funcs = {
   },
   async updateKeys(keys) {
     return global._dodo_simulator_update_keys(keys)
+  },
+  async setFramFlusher(callback) {
+    return global._dodo_simulator_set_fram_flusher(callback)
   }
 }
 
