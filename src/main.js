@@ -7,15 +7,19 @@ import App from './App.vue'
 import VueRouter from 'vue-router'
 import VueCookies from 'vue-cookies'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
-import VueShowdownPlugin from 'vue-showdown';
+import VueShowdownPlugin from 'vue-showdown'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import router from './router'
+import Responsive from 'vue-responsive'
+import CheckView from 'vue-check-view'
 
 Vue.use(VueRouter)
 Vue.use(VueCookies)
 Vue.use(BootstrapVue)
 Vue.use(IconsPlugin)
+Vue.use(Responsive)
+Vue.use(CheckView)
 
 axios.interceptors.request.use(
   (config) => {
