@@ -8,7 +8,7 @@ This new version is a complete rewrite using VueJS with only the core simulator 
 
 This version also separates the [backend API](https://github.com/peternoyes/dodo-api) out into a separate repository. 
 
-To see this version in action visit [next.dodolabs.io](https://next.dodolabs.io).
+To see this version in action visit [next.dodolabs.io](https://next.dodolabs.io/?code=fc1811bd).
 
 ## WASM
 

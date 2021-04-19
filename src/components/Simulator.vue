@@ -190,7 +190,8 @@ export default {
     -moz-user-select:none !important;
     -ms-user-select:none !important;
     user-select:none !important;
-    -webkit-tap-highlight-color:rgba(0,0,0,0) !important;    
+    -webkit-tap-highlight-color:rgba(0,0,0,0) !important;
+    touch-action: manipulation !important;
     position: absolute;
     height:44px;
     width:44px;
